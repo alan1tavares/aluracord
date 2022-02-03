@@ -224,7 +224,6 @@ function MessageList(props) {
             ) : (
               mensagem.texto
             )}
-            {/* {mensagem.texto} */}
           </Text>
         );
       })}
