@@ -195,29 +195,48 @@ function MessageList(props) {
             <Box
               styleSheet={{
                 marginBottom: "8px",
+                display: "flex",
+                alignItems: "center",
               }}
             >
-              <Image
-                styleSheet={{
-                  width: "20px",
-                  height: "20px",
-                  borderRadius: "50%",
-                  display: "inline-block",
-                  marginRight: "8px",
-                }}
-                src={`https://github.com/${mensagem.de}.png`}
-              />
-              <Text tag="strong">{mensagem.de}</Text>
-              <Text
-                styleSheet={{
-                  fontSize: "10px",
-                  marginLeft: "8px",
-                  color: appConfig.theme.colors.neutrals[300],
-                }}
-                tag="span"
+              <Box
+                styleSheet={{ flex: 1, display: "flex", alignItems: "center" }}
               >
-                {new Date().toLocaleDateString()}
-              </Text>
+                <Image
+                  styleSheet={{
+                    width: "20px",
+                    height: "20px",
+                    borderRadius: "50%",
+                    display: "inline-block",
+                    marginRight: "8px",
+                  }}
+                  src={`https://github.com/${mensagem.de}.png`}
+                />
+                <Text tag="strong">{mensagem.de}</Text>
+                <Text
+                  styleSheet={{
+                    fontSize: "10px",
+                    marginLeft: "8px",
+                    color: appConfig.theme.colors.neutrals[300],
+                  }}
+                  tag="span"
+                >
+                  {new Date().toLocaleDateString()}
+                </Text>
+              </Box>
+
+              <Box
+                styleSheet={{ flex: 1, textAlign: "end", paddingRight: "32px" }}
+              >
+                <Text
+                  styleSheet={{
+                    color:  appConfig.theme.colors.neutrals[300],
+                    fontWeight: "bolder"
+                  }}
+                >
+                  x
+                </Text>
+              </Box>
             </Box>
             {mensagem.texto.startsWith(":sticker:") ? (
               <Image src={mensagem.texto.replace(":sticker:", "")} />
