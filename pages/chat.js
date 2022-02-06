@@ -10,11 +10,14 @@ const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-function escutaMensagemEmTempoReal(adicionaMensagm) {
+function escutaMensagemEmTempoReal(adicionaMensagm, removeMessage) {
   return supabaseClient
     .from("mensagens")
     .on("INSERT", (response) => {
       adicionaMensagm(response.new);
+    })
+    .on('DELETE', (response) => {
+      removeMessage(response.old);
     })
     .subscribe();
 }
@@ -35,11 +38,19 @@ export default function ChatPage() {
         setListaDeMensagens(data);
       });
 
-    escutaMensagemEmTempoReal((novaMensagem) => {
-      setListaDeMensagens((valorAtualDaLista) => {
-        return [novaMensagem, ...valorAtualDaLista];
-      });
-    });
+    escutaMensagemEmTempoReal(
+      (novaMensagem) => {
+        setListaDeMensagens((valorAtualDaLista) => {
+          return [novaMensagem, ...valorAtualDaLista];
+        });
+      },
+      (oldMessage) => {
+        setListaDeMensagens((currentValue) => {
+          return currentValue.filter((value) => value.id !== oldMessage.id)
+        })
+      }
+    );
+
   }, []);
 
   function handleNovaMensagem(novaMensagem) {
@@ -51,21 +62,21 @@ export default function ChatPage() {
     supabaseClient
       .from("mensagens")
       .insert([mensagem])
-      .then(({ data }) => {});
+      .then(({ data }) => { });
 
     setMensagem("");
   }
 
-  function handleDeleteMessage(id) {
-    supabaseClient
+  async function handleDeleteMessage(id) {
+    console.log('deleção do id: ' + id);
+    await supabaseClient
       .from('mensagens')
       .delete()
-      .match({id})
-      .execute();
+      .match({ 'id': id })
   }
-
   return (
     <Box
+
       styleSheet={{
         display: "flex",
         alignItems: "center",
@@ -105,7 +116,7 @@ export default function ChatPage() {
             padding: "16px",
           }}
         >
-          <MessageList mensagens={listaDeMensagens} />
+          <MessageList mensagens={listaDeMensagens} handleDeleteMessage={handleDeleteMessage} />
 
           <Box
             as="form"
@@ -215,14 +226,14 @@ function MessageList(props) {
               >
                 <Text
                   styleSheet={{
-                    color:  appConfig.theme.colors.neutrals[300],
+                    color: appConfig.theme.colors.neutrals[300],
                     fontWeight: "bolder",
                     hover: {
                       color: "red",
                       cursor: "pointer"
                     }
                   }}
-                  onClick={() => handleDeleteMessage(mensagem.id)}
+                  onClick={() => props.handleDeleteMessage(mensagem.id)}
                 >
                   x
                 </Text>
