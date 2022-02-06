@@ -4,6 +4,7 @@ import { Box, Text, TextField, Image, Button } from "@skynexui/components";
 import { createClient } from "@supabase/supabase-js";
 import appConfig from "../config.json";
 import { ButtonSendSticker } from "../src/components/ButtonSendSticker";
+import Header from "../src/components/Header";
 
 const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const SUPABASE_ANON_KEY = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -53,6 +54,14 @@ export default function ChatPage() {
       .then(({ data }) => {});
 
     setMensagem("");
+  }
+
+  function handleDeleteMessage(id) {
+    supabaseClient
+      .from('mensagens')
+      .delete()
+      .match({id})
+      .execute();
   }
 
   return (
@@ -141,30 +150,6 @@ export default function ChatPage() {
   );
 }
 
-function Header() {
-  return (
-    <>
-      <Box
-        styleSheet={{
-          width: "100%",
-          marginBottom: "16px",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-        }}
-      >
-        <Text variant="heading5">Chat</Text>
-        <Button
-          variant="tertiary"
-          colorVariant="neutral"
-          label="Logout"
-          href="/"
-        />
-      </Box>
-    </>
-  );
-}
-
 function MessageList(props) {
   return (
     <Box
@@ -231,8 +216,13 @@ function MessageList(props) {
                 <Text
                   styleSheet={{
                     color:  appConfig.theme.colors.neutrals[300],
-                    fontWeight: "bolder"
+                    fontWeight: "bolder",
+                    hover: {
+                      color: "red",
+                      cursor: "pointer"
+                    }
                   }}
+                  onClick={() => handleDeleteMessage(mensagem.id)}
                 >
                   x
                 </Text>
